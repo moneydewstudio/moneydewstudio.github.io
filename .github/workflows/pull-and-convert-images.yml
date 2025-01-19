@@ -1,0 +1,40 @@
+name: Pull Images from Unsplash Collection and Convert to AVIF
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  pull_and_convert_images:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Pull images from Unsplash collection
+      run: |
+        mkdir -p images
+        curl -H "Authorization: Client-ID ${{ secrets.4eJqc7sS9Os21Jv-X6wVEYBUemz_ajE1H2w3RAX9jxM }}" "https://api.unsplash.com/collections/1580860/photos?per_page=1" -o images/image.jpg
+
+    - name: Convert images to AVIF
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libavif-bin
+        for img in images/*.jpg; do
+          avifenc "$img" "${img%.jpg}.avif"
+        done
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add images/
+        git commit -m 'Add pulled images and convert to AVIF'
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.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 }}
