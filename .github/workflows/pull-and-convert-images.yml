@@ -19,14 +19,16 @@ jobs:
     - name: Pull images from Unsplash collection
       run: |
         mkdir -p images
-        curl -H "Authorization: Client-ID ${{ 4eJqc7sS9Os21Jv-X6wVEYBUemz_ajE1H2w3RAX9jxM }}" "https://api.unsplash.com/collections/1580860/photos?per_page=1" -o images/image.jpg
-
-    - name: Convert images to AVIF
+        curl -H "Authorization: Client-ID ${{ secrets.UNSPLASH_ACCESS_KEY }}" "https://api.unsplash.com/collections/1580860/photos?per_page=1" -o images/image.jpg
+        
+    - name: Convert images to AVIF and rename
       run: |
         sudo apt-get update
         sudo apt-get install -y libavif-bin
+        i=1
         for img in images/*.jpg; do
-          avifenc "$img" "${img%.jpg}.avif"
+          avifenc "$img" "images/$i.avif"
+          i=$((i+1))
         done
 
     - name: Commit and push changes
@@ -37,4 +39,4 @@ jobs:
         git commit -m 'Add pulled images and convert to AVIF'
         git push
       env:
-        GITHUB_TOKEN: ${{ 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 }}
+        GITHUB_TOKEN: ${{ secrets.GTOKEN }}
