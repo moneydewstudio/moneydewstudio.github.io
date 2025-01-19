@@ -23,7 +23,7 @@ jobs:
 
       - name: Download Images
         run: |
-          bulksplash --d=images --a=200 --c=https://unsplash.com/t/people --n=1 --k=${{ secrets.UNSPLASH_API_KEY }}
+          bulksplash --d=images --a=200 --c=https://unsplash.com/collections/895838/people --n=1 --k=${{ secrets.UNSPLASH_API_KEY }}
 
       - name: Commit and push images
         run: |
