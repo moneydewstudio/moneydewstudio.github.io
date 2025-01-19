@@ -19,7 +19,7 @@ jobs:
     - name: Pull images from Unsplash collection
       run: |
         mkdir -p images
-        curl -H "Authorization: Client-ID ${{ secrets.4eJqc7sS9Os21Jv-X6wVEYBUemz_ajE1H2w3RAX9jxM }}" "https://api.unsplash.com/collections/1580860/photos?per_page=1" -o images/image.jpg
+        curl -H "Authorization: Client-ID ${{ 4eJqc7sS9Os21Jv-X6wVEYBUemz_ajE1H2w3RAX9jxM }}" "https://api.unsplash.com/collections/1580860/photos?per_page=1" -o images/image.jpg
 
     - name: Convert images to AVIF
       run: |
@@ -37,4 +37,4 @@ jobs:
         git commit -m 'Add pulled images and convert to AVIF'
         git push
       env:
-        GITHUB_TOKEN: ${{ secrets.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 }}
+        GITHUB_TOKEN: ${{ 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 }}
