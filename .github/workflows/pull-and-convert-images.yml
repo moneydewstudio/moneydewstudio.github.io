@@ -1,42 +1,34 @@
-name: Pull Images from Unsplash Collection and Convert to AVIF
+name: Bulksplash Image Download
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 6 * * *'
-
-permissions:
-  contents: write
+    - cron: '0 0 * * *' # Runs daily at midnight
+  workflow_dispatch:
 
 jobs:
-  pull_and_convert_images:
+  download-images:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Pull images from Unsplash collection
-      run: |
-        mkdir -p images
-        curl -H "Authorization: Client-ID ${{ secrets.UNSPLASH_ACCESS_KEY }}" "https://api.unsplash.com/collections/1580860/photos?per_page=1" -o images/image.jpg
-        
-    - name: Convert images to AVIF and rename
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libavif-bin
-        i=1
-        for img in images/*.jpg; do
-          avifenc "$img" "images/$i.avif"
-          i=$((i+1))
-        done
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
-    - name: Commit and push changes
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add images/
-        git commit -m 'Add pulled images and convert to AVIF'
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GTOKEN }}
+      - name: Install Bulksplash
+        run: npm install bulksplash --g
+
+      - name: Download Images
+        run: |
+          bulksplash --d=images --a=10 --f --k=${{ secrets.UNSPLASH_API_KEY }}
+
+      - name: Commit and push images
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add images/*
+          git commit -m 'Add downloaded images'
+          git push
